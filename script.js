@@ -4,9 +4,27 @@ const quoteText = document.getElementById('quote');
 const authorText = document.getElementById('author');
 const twitterBtn = document.getElementById('twitter');
 const newQuoteBtn = document.getElementById('new-quote');
+const loader = document.getElementById('loader');
+
+// Show loading
+function loading() {
+    loader.hidden = false;
+    quoteContainer.hidden = true;
+}
+
+// Hide loading
+function complete() {
+    if (!loader.hidden) {
+        quoteContainer.hidden = false;
+        loader.hidden = true;
+    }
+}
 
 // Get quote from API
 async function getQuote() {
+    // Show loading before the data is fetched
+    loading();
+
     const proxyUrl = 'https://pacific-harbor-33249.herokuapp.com/';
     const apiUrl = 'http://api.forismatic.com/api/1.0/?method=getQuote&lang=en&format=json';
     
@@ -29,6 +47,9 @@ async function getQuote() {
         }
 
         quoteText.innerText = data.quoteText;
+
+        // Stop loader and show quote
+        complete();
     } catch (err) {
         getQuote();
         console.log(err);
