@@ -1,3 +1,10 @@
+// Global variables
+const MAX_API_CALLS = 10;
+const LONG_QUOTE_LENGHT = 80;
+
+// Count to avoid infinite loop for API calls
+let quoteApiCalls = 0;
+
 // Get HTML elements
 const quoteContainer = document.getElementById('quote-container');
 const quoteText = document.getElementById('quote');
@@ -6,14 +13,12 @@ const twitterBtn = document.getElementById('twitter');
 const newQuoteBtn = document.getElementById('new-quote');
 const loader = document.getElementById('loader');
 
-// Show loading
-function loading() {
+function showLoadingSpinner() {
     loader.hidden = false;
     quoteContainer.hidden = true;
 }
 
-// Hide loading
-function complete() {
+function hideLoadingSpinner() {
     if (!loader.hidden) {
         quoteContainer.hidden = false;
         loader.hidden = true;
@@ -22,8 +27,7 @@ function complete() {
 
 // Get quote from API
 async function getQuote() {
-    // Show loading before the data is fetched
-    loading();
+    showLoadingSpinner();
 
     const proxyUrl = 'https://pacific-harbor-33249.herokuapp.com/';
     const apiUrl = 'http://api.forismatic.com/api/1.0/?method=getQuote&lang=en&format=json';
@@ -31,6 +35,9 @@ async function getQuote() {
     try {
         const res = await fetch(proxyUrl + apiUrl);
         const data = await res.json();
+
+        // Incrementing API calls counter
+        quoteApiCalls++;
 
         // If from API fetching author property comes as blank string set author as unknown instead
         if (data.quoteAuthor === '') {
@@ -40,20 +47,30 @@ async function getQuote() {
         }
 
         // Reduce font size for longer quotes
-        if (data.quoteText.length > 80) {
+        if (data.quoteText.length > LONG_QUOTE_LENGHT) {
             quoteText.classList.add('long-quote');
         } else {
             quoteText.classList.remove('long-quote');
         }
 
         quoteText.innerText = data.quoteText;
-
-        // Stop loader and show quote
-        complete();
+        hideLoadingSpinner();
     } catch (err) {
-        getQuote();
-        console.log(err);
+        // Stop rerunning API call function if calls counter is above max calls value and show error details in the quote container isntead
+        if (quoteApiCalls < MAX_API_CALLS) {
+            getQuote();
+        } else {
+            renderError(err);
+            console.error(err)
+        }
     }
+}
+
+// Display error details in the quote container area
+function renderError(errorMsg) {
+    hideLoadingSpinner();
+    quoteText.innerText = 'Oops, something went wrong!';
+    authorText.innerText = errorMsg;
 }
 
 // Tweet quote

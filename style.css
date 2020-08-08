@@ -73,6 +73,7 @@ button:active {
 .twitter-button {
     border: solid 1px #1E2133;
     color: #1E2133;
+    margin-right: 20px;
     background-color: transparent;
     transition: color .3s ease-in-out, 
                 background-color .3s ease-in-out,
