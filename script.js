@@ -1,5 +1,5 @@
 // Global variables
-const MAX_API_CALLS = 10;
+const MAX_API_CALLS = 20;
 const LONG_QUOTE_LENGHT = 80;
 
 // Count to avoid infinite loop for API calls
